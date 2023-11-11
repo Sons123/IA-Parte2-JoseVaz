@@ -1,20 +1,30 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public sealed class World {
+//A singleton to hold an array of all the hiding spots in the game environment
+public sealed class World
+{
+    private static readonly World instance = new World();
+    private static GameObject[] hidingSpots;
 
-    static readonly World instance = new World();
-    static GameObject[] hidingSpots;
-
-    static World() {
-
+    //construct the singleton
+    static World()
+    {
+        //populate hiding spot array with objects in the environment
+        //that match the tag
         hidingSpots = GameObject.FindGameObjectsWithTag("hide");
     }
 
-    World() { }
+    private World() { }
 
+    public static World Instance
+    {
+        get { return instance; }
+    }
 
-    public static World Instance { get { return instance; } }
-    public GameObject[] GetHidingSpots() { return hidingSpots; }
+    public GameObject[] GetHidingSpots()
+    {
+        return hidingSpots;
+    }
 }
