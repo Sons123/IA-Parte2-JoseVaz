@@ -16,6 +16,8 @@ public class Bot : MonoBehaviour {
 
     float q = 0.0f;
 
+    bool coolDown = false;
+
 
     void Start() {
 
@@ -132,27 +134,55 @@ public class Bot : MonoBehaviour {
         Seek(info.point + chosenDir.normalized * 2.0f);
     }
 
-    bool CanSeeTarget() 
-    {
+    bool CanSeeTarget() {
 
         RaycastHit raycastInfo;
         Vector3 rayToTarget = target.transform.position - transform.position;
-        if (Physics.Raycast(transform.position, rayToTarget, out raycastInfo)) {
+        float lookAngle = Vector3.Angle(transform.forward, rayToTarget);
+        if (lookAngle < 60.0f && Physics.Raycast(transform.position, rayToTarget, out raycastInfo)) {
 
             if (raycastInfo.transform.gameObject.tag == "cop") return true;
         }
         return false;
     }
 
-    void Update() {
+    bool CanSeeMe() 
+    {
+
+        Vector3 rayToTarget = transform.position - target.transform.position;
+        float lookAngle = Vector3.Angle(target.transform.forward, rayToTarget);
+
+        if (lookAngle < 60.0f) return true;
+        return false;
+    }
+    
+    void BehaviourCoolDown() 
+    {
+
+        coolDown = false;
+    }
+
+    void Update() 
+    {
 
         // Seek(target.transform.position);
         // Flee(target.transform.position);
         // Pursue();
         // Evade();
         // Wander();
-         //Hide();
-        if (CanSeeTarget()) 
-            CleverHide();
+        // Hide();
+        if (!coolDown) 
+        {
+
+            if (CanSeeTarget() && CanSeeMe()) 
+            {
+
+                CleverHide();
+                coolDown = true;
+                Invoke("BehaviourCoolDown", 5.0f);
+            } 
+            else 
+                Pursue();
+        }
     }
 }
